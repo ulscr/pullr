@@ -6,14 +6,12 @@ import requests
 from bs4 import BeautifulSoup as Soup
 from datetime import datetime, timedelta
 
-def query_bellboard(self, user_id):
+def query_bellboard(name):
     BB_SEARCH_URL = 'http://bb.ringingworld.co.uk/export.php?ringer='
     PAGE_URL = "&page="
-    user = User.objects.get(id=user_id)
     #Get a list of bellboard names
-    names = RingingName.objects.filter(user=user)
+    names = [name]
 
-    ringingnames = RingingName.objects.all()
 
     time_regex = re.compile("((\d+) ?[:\.h])?[ours ]*((\d+) ?[sS])?[seconds ]*((\d+)[ mM]*)?")
 
@@ -23,7 +21,7 @@ def query_bellboard(self, user_id):
     for ringingname in names:
         page = 1
         continue_flag = True
-        name = ringingname.name
+        name = ringingname
         name_added = 0
         while True:
             xml = requests.get(BB_SEARCH_URL + name + PAGE_URL + str(page) , headers={'Accept':'application/xml'})
@@ -33,7 +31,6 @@ def query_bellboard(self, user_id):
             total_performances += len(performances)
             for performance in performances:
                 total_count += 1
-                self.update_state(state='PROGRESS', meta={'current':total_count, 'total':total_performances})
                 try:
                     perf = Performance.objects.get(bellboardId=performance['id'].replace("P",""))
                     continue
@@ -46,11 +43,11 @@ def query_bellboard(self, user_id):
                 county = ""
                 for placename in performance.find_all("place-name"):
                     if placename['type'] == "place":
-                        town = unicode(placename.string)
+                        town = placename.string
                     if placename['type'] == "dedication":
-                        dedication = unicode(placename.string)
+                        dedication = placename.string
                     if placename['type'] == "county":
-                        county = unicode(placename.string)
+                        county = placename.string
     
                 try:
                     place = Place.objects.get(name=town, dedication=dedication, county=county)
@@ -60,26 +57,26 @@ def query_bellboard(self, user_id):
                     place.dedication = dedication
                     place.county = county
                     try:
-                        place.tenor = unicode(performance.place.ring['tenor'])
+                        place.tenor = performance.place.ring['tenor']
                     except KeyError:
                         place.tenor = ""
-                    place.type = unicode(performance.place.ring['type'])
+                    place.type = performance.place.ring['type']
                     place.save()
     
 
                 perf = Performance()
 
-                perf.bellboardId = unicode(performance['id']).replace("P","")
-                perf.date = datetime.strptime(unicode(performance.date.string), '%Y-%m-%d')
-                perf.changes = int(unicode(performance.title.changes.string))
-                perf.method = unicode(performance.title.method.string)
-                perf.association = unicode(performance.association.string)
+                perf.bellboardId = performance['id'].replace("P","")
+                perf.date = datetime.strptime(performance.date.string, '%Y-%m-%d')
+                perf.changes = int(performance.title.changes.string)
+                perf.method = performance.title.method.string
+                perf.association = performance.association.string
                 try:
-                    perf.details = unicode(performance.details.string)
+                    perf.details = performance.details.string
                 except:
                     perf.details = ""
                 try:
-                    duration = unicode(performance.duration.string)
+                    duration = performance.duration.string
                     match = time_regex.match(duration)
                     hours = 0
                     minutes = 0
@@ -96,7 +93,7 @@ def query_bellboard(self, user_id):
                     pass
                 
                 try:
-                    perf.composer = unicode(performance.composer.string)
+                    perf.composer = performance.composer.string
                 except:
                     pass #No composer here
                 
@@ -108,22 +105,22 @@ def query_bellboard(self, user_id):
                 request_added += 1
     
                 for footnote in performance.find_all("footnote"):
-                    fn = Footnote(value=unicode(footnote.string), performance=perf)
+                    fn = Footnote(value=footnote.string, performance=perf)
                     fn.save()
 
                 #Find the ringers
                 for ringer in performance.find_all('ringer'):
                     try:
-                        r = Ringer.objects.get(name=unicode(ringer.string))
+                        r = Ringer.objects.get(name=ringer.string)
                     except:
                         r = Ringer()
-                        r.name = unicode(ringer.string)
+                        r.name = ringer.string
                     
                         r.save()
 
                     #Try to match with all ringingnames
-                    for namestring in ringingnames:
-                        nameregex = namestring.name \
+                    for namestring in names:
+                        nameregex = namestring \
                                         .replace("\\", "\\\\") \
                                         .replace(".", "\.") \
                                         .replace("*", ".*")
@@ -133,14 +130,14 @@ def query_bellboard(self, user_id):
     
 
                     try:
-                        rp = RingerPerformance.objects.get(performance__bellboardId=unicode(performance['id']), ringer=unicode(ringer.string))
+                        rp = RingerPerformance.objects.get(performance__bellboardId=performance['id'], ringer=ringer.string)
                     except:
                         rp = RingerPerformance()
                         rp.ringer = r
                         rp.performance = perf
-                        rp.bell = unicode(ringer['bell'])
+                        rp.bell = ringer['bell']
                         try:
-                            unicode(ringer['conductor'])
+                            ringer['conductor']
                             rp.conductor = True
                         except:
                             rp.conductor = False
