@@ -16,5 +16,6 @@ pip install -r requirements.txt
 source env/bin/activate
 ./manage.py runserver
 ```
-
+## Documentation
+[Django Tutorial](https://docs.djangoproject.com/en/1.9/intro/tutorial01/)
 
