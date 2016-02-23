@@ -1,4 +1,5 @@
 # pullr
+[![Build Status](https://travis-ci.org/ulscr/pullr.svg?branch=master)](https://travis-ci.org/ulscr/pullr)
 Ringing Dating Website
 
 ## Installation
