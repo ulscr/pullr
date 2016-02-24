@@ -1,8 +1,31 @@
 language: python
 python: 3.5
 
-install: "pip install -r requirements.txt"
+services:
+  - postgresql
+addons:
+  postgresql: '9.3'
+
+env:
+  - DATABASE_URL="postgres://postgres@localhost:5432/travis_ci_test" DEPLOY=true
+  - DATABASE_URL="sqlite://:memory:"
+
+install: pip install -r requirements.txt
+
+before_script:
+  - psql -c 'create database travis_ci_test;' -U postgres
 
 script:
-  - ./manage.py collectstatic --noinput
-  - ./manage.py test
+  - "./manage.py collectstatic --noinput"
+  - "./manage.py test"
+
+deploy:
+  provider: heroku
+  app: bell-pullr
+  run:
+    - "./manage.py migrate"
+    - restart
+  on:
+    condition: $DEPLOY = true
+  api_key:
+    secure: CsP+IfHSI+sP7WiG5TtzKkbvq4rF8rEWkMOE0lM01LxnbkuS3kxmVJnfZp538szdpbax0rEi/FLF42vIRJ3OMVrd/MSnGtlnxNnBkxIn/rxhCR/V8MB756bPDpZd02JkSwAuFxd4lisrXwK0DE0ppNKXKTw4ZJINf69cGMKj8E3Wtim7N6Zn9k0AJYF8gf902VuKlMLeWIqAPBWASWn4EAwABcTQCn8dz194XQ5I5sUAYHTrJdHj/DpOZQILtl9aBNhMaB7J6PwJdoa6ALB1heGvCG4f9XTe7ErdCR0yigTbs4FIuZxhIFPAwrQGjRzHUmFxDqhjfvPxlwXKwbE1GTG9CU2DkK1wiOOzQWXzJujs4aAa8uPMwbp9mDm+xFGz0s/gcMU2xXK8M2U8Fk4qKXk5iKipy2f3UhT+nUJb3Ioj7r1AadRpFsZG5dnPgmoaXQ5lXKnwnxgDGOmHowsxvULoS61JDNef/O5jlDtEgQm5eE9/FperrjW+uZlMyZqfmjiaPHiFPnAADXvxMoUdfh+X3WZG5M3a9ODbZBxUmoUHDWgEr2PB8vNEo1J15VyO+tduUgrL8yBQ2EaWfKgJiOFxua2/NMiTx4ExHu5ddXJ/MXV7rsAeZ+LA58FzuZiz73x9fDZEfQmf2pEtRKddOXPaJUVXPvKro6Czaikmk84=
