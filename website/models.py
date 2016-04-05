@@ -18,11 +18,11 @@ class Performance(models.Model):
     association = models.CharField(max_length=100)
     duration = models.DurationField()
     date = models.DateTimeField()
-    method = models.CharField(max_length=100)
+    method = models.CharField(max_length=1000)
     changes = models.IntegerField()
     composer = models.CharField(max_length=100)
     place = models.ForeignKey(Place)
-    details = models.CharField(max_length=1000)
+    details = models.TextField()
 
     composer.null = True
     composer.blank = True
