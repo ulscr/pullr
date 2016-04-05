@@ -7,14 +7,12 @@ In the long-run, I have no idea, but for now:
 ```shell
 git clone https://github.com/ulscr/pullr.git
 cd pullr
-virtualenv -p `which python3` env
-source env/bin/activate
-pip install -r dev-requirements.txt
+. bootstrap.sh
 ```
 
 ## Running
 ```shell
-source env/bin/activate
+. boostrap.sh
 ./manage.py runserver
 ```
 ## Documentation
