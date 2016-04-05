@@ -1,0 +1,9 @@
+
+{% if message %}<span>{{ message }} </span>{% endif %}
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<form action="{% url 'website:import' %}" method="post">
+  {% csrf_token %}
+  <input type="text" name="name" id="name" value="" placeholder="Bellboard Name" />
+  <input type="submit" value="Import" />
+</form>

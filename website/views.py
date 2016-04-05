@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from django.template.loader import render_to_string
+from django.shortcuts import render
 
 from website.models import Ringer,Performance
 
@@ -13,10 +13,10 @@ def index(request):
 
     performances = Performance.objects.order_by("method");
 
-    rendered = render_to_string('website/index.html', {'ringers': ringers, 'performances': performances})
+    return render(request, 'website/index.html', {'ringers': ringers, 'performances': performances})
 
-    return HttpResponse(rendered);
-
-def test(request, stuff):
-    tasks.query_bellboard(stuff)
-    return HttpResponse("Hello " + stuff);
+def import_names(request):
+    if ('name' in request.POST.keys()):
+      tasks.query_bellboard(request.POST['name'])
+      return render(request, 'website/import.html', {'message':"Imported for " + request.POST['name']});
+    return render(request, 'website/import.html')
