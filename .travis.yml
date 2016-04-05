@@ -17,6 +17,7 @@ before_script:
 
 script:
   - "./manage.py collectstatic --noinput"
+  - "./manage.py check"
   - "./manage.py test"
 
 deploy:
