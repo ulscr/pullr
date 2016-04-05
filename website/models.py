@@ -9,7 +9,7 @@ class Place(models.Model):
     tenor = models.CharField(max_length=100)
     type = models.CharField(max_length=100)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.dedication + ", " + self.name + ", " + self.county
 
 
@@ -36,21 +36,21 @@ class Performance(models.Model):
     duration.null = True
     duration.blank = True
 
-    def __unicode__(self):
+    def __str__(self):
         return str(self.changes) + " " + self.method
 
 class Footnote(models.Model):
     value = models.CharField(max_length=300)
     performance = models.ForeignKey(Performance)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.value
 
 class RingingName(models.Model):
     name = models.CharField(max_length=100)
     user = models.ForeignKey(User)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 class Ringer(models.Model):
@@ -59,7 +59,7 @@ class Ringer(models.Model):
 
     ringingname.null = True
 
-    def __unicode__(self):
+    def __str__(self):
         additional = ""
         if self.ringingname is not None:
             additional = " (Linked)"
@@ -73,9 +73,9 @@ class RingerPerformance(models.Model):
 
     ringer.null = True
 
-    def __unicode__(self):
+    def __str__(self):
         return self.ringer.name + " on " + str(self.bell) + " for " + str(self.performance)
 
-    
+
 
 
