@@ -9,10 +9,9 @@ from . import tasks
 # Create your views here.
 
 def index(request):
-    ringers = Ringer.objects.all();
-    sorted(ringers, key=lambda ringer: ringer.name)
+    ringers = Ringer.objects.order_by("name");
 
-    performances = Performance.objects.all();
+    performances = Performance.objects.order_by("method");
 
     rendered = render_to_string('website/index.html', {'ringers': ringers, 'performances': performances})
 
