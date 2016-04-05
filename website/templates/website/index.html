@@ -33,6 +33,20 @@
       <h1>Welcome to Pullr!</h1>
       {# Display django.contrib.messages as Bootstrap alerts #}
       {% bootstrap_messages %}
+     
+      <h3>Known ringers:</h3>
+      {% for ringer in ringers %}
+        <ul>
+          <li><a href="http://bb.ringingworld.co.uk/search.php?ringer={{ ringer.name }}">{{ ringer.name }}</a></li>
+        </ul>
+      {% endfor %}
+      <h3>Known performances:</h3>
+      {% for performance in performances %}
+        <ul>
+          <li><a href="http://bb.ringingworld.co.uk/view.php?id={{performance.bellboardId}}">{{performance.changes}} {{ performance.method }}</a></li>
+        </ul>
+      {% endfor %}
+    </div>
     </div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
