@@ -9,7 +9,7 @@ git clone https://github.com/ulscr/pullr.git
 cd pullr
 virtualenv env
 source env/bin/activate
-pip install -r requirements.txt
+pip install -r dev-requirements.txt
 ```
 
 ## Running
