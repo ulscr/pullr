@@ -10,18 +10,17 @@ def query_bellboard(name):
     BB_SEARCH_URL = 'http://bb.ringingworld.co.uk/export.php?ringer='
     PAGE_URL = "&page="
     #Get a list of bellboard names
+    print "Fetching for " + name
     names = [name]
-
 
     time_regex = re.compile("((\d+) ?[:\.h])?[ours ]*((\d+) ?[sS])?[seconds ]*((\d+)[ mM]*)?")
 
     added = 0
     total_count = 0
     total_performances = 0
-    for ringingname in names:
+    for name in names:
         page = 1
         continue_flag = True
-        name = ringingname
         name_added = 0
         while True:
             xml = requests.get(BB_SEARCH_URL + name + PAGE_URL + str(page) , headers={'Accept':'application/xml'})
@@ -62,13 +61,12 @@ def query_bellboard(name):
                         place.tenor = ""
                     place.type = performance.place.ring['type']
                     place.save()
-    
 
                 perf = Performance()
 
                 perf.bellboardId = performance['id'].replace("P","")
                 perf.date = datetime.strptime(performance.date.string, '%Y-%m-%d')
-                perf.changes = int(performance.title.changes.string)
+                perf.changes = int(performance.title.changes.string or 0)
                 perf.method = performance.title.method.string
                 perf.association = performance.association.string
                 try:
@@ -118,15 +116,16 @@ def query_bellboard(name):
                     
                         r.save()
 
+# Skip ringing names for now...
                     #Try to match with all ringingnames
-                    for namestring in names:
-                        nameregex = namestring \
-                                        .replace("\\", "\\\\") \
-                                        .replace(".", "\.") \
-                                        .replace("*", ".*")
-                        if re.match(nameregex, r.name) and not r.ringingname:
-                            r.ringingname = ringingname
-                            r.save()
+#                    for namestring in names:
+#                        nameregex = namestring \
+#                                        .replace("\\", "\\\\") \
+#                                        .replace(".", "\.") \
+#                                        .replace("*", ".*")
+#                        if re.match(nameregex, r.name) and not r.ringingname:
+#                            r.name = r.name
+#                            r.save()
     
 
                     try:
@@ -142,9 +141,6 @@ def query_bellboard(name):
                         except:
                             rp.conductor = False
                         rp.save()
-
-
-                
 
             #END FOR PERFORMANCE
             page += 1
