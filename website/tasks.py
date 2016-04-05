@@ -10,7 +10,6 @@ def query_bellboard(name):
     BB_SEARCH_URL = 'http://bb.ringingworld.co.uk/export.php?ringer='
     PAGE_URL = "&page="
     #Get a list of bellboard names
-    print "Fetching for " + name
     names = [name]
 
     time_regex = re.compile("((\d+) ?[:\.h])?[ours ]*((\d+) ?[sS])?[seconds ]*((\d+)[ mM]*)?")
@@ -47,7 +46,7 @@ def query_bellboard(name):
                         dedication = placename.string
                     if placename['type'] == "county":
                         county = placename.string
-    
+
                 try:
                     place = Place.objects.get(name=town, dedication=dedication, county=county)
                 except:
@@ -89,19 +88,19 @@ def query_bellboard(name):
                     perf.duration = thetimedelta
                 except:
                     pass
-                
+
                 try:
                     perf.composer = performance.composer.string
                 except:
                     pass #No composer here
-                
+
 
                 perf.place = place
                 perf.save()
                 added += 1
                 name_added += 1
                 request_added += 1
-    
+
                 for footnote in performance.find_all("footnote"):
                     fn = Footnote(value=footnote.string, performance=perf)
                     fn.save()
@@ -113,7 +112,7 @@ def query_bellboard(name):
                     except:
                         r = Ringer()
                         r.name = ringer.string
-                    
+
                         r.save()
 
 # Skip ringing names for now...
@@ -126,7 +125,7 @@ def query_bellboard(name):
 #                        if re.match(nameregex, r.name) and not r.ringingname:
 #                            r.name = r.name
 #                            r.save()
-    
+
 
                     try:
                         rp = RingerPerformance.objects.get(performance__bellboardId=performance['id'], ringer=ringer.string)
@@ -149,6 +148,6 @@ def query_bellboard(name):
 
 
         #END WHILE
-    
+
     return str(added)
 
